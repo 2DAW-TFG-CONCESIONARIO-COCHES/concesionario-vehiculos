@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:8.0
+    container_name: concesionario_db
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
+    environment:
+      MYSQL_DATABASE: concesionario_db
+      MYSQL_USER: concesionario_user
+      MYSQL_PASSWORD: concesionario_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - concesionario_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend Service (Node.js + Express)
+  backend:
+    image: node:18-alpine
+    container_name: concesionario_backend
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - DB_HOST=db
+      - DB_USER=concesionario_user
+      - DB_PASSWORD=concesionario_pass
+      - DB_NAME=concesionario_db
+      - JWT_SECRET=tu_clave_secreta_jwt_para_docker
+      - JWT_EXPIRES_IN=24h
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - concesionario_network
+    restart: unless-stopped
+    command: sh -c "npm install && npm run dev"
+
+  # Frontend Service (React)
+  frontend:
+    image: node:18-alpine
+    container_name: concesionario_frontend
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - concesionario_network
+    restart: unless-stopped
+    command: sh -c "npm install && npm start"
+    stdin_open: true
+    tty: true
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: concesionario_phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: root_password
+      PMA_ARBITRARY: 1
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - concesionario_network
+    restart: unless-stopped
+
+# Volumes
+volumes:
+  mysql_data:
+    driver: local
+
+# Networks
+networks:
+  concesionario_network:
+    driver: bridge
