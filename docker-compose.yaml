@@ -15,6 +15,8 @@ services:
       MYSQL_ROOT_PASSWORD: root_password
     volumes:
       - mysql_data:/var/lib/mysql
+      # Montar los scripts de inicialización
+      - ./database:/docker-entrypoint-initdb.d
     networks:
       - concesionario_network
     restart: unless-stopped

@@ -1,11 +1,13 @@
 const Vehiculo = require("../models/vehiculo.model")
 const Modelo = require("../models/modelo.model")
 const Marca = require("../models/marca.model")
-const { Op } = require("sequelize") // Import Op from sequelize
+const { Op } = require("sequelize")
 
 // Obtener todos los vehículos
 exports.findAll = async (req, res) => {
   try {
+    console.log("Obteniendo todos los vehículos...") // Para debug
+
     const vehiculos = await Vehiculo.findAll({
       include: [
         {
@@ -15,8 +17,11 @@ exports.findAll = async (req, res) => {
         },
       ],
     })
+
+    console.log(`Se encontraron ${vehiculos.length} vehículos`) // Para debug
     res.status(200).json(vehiculos)
   } catch (error) {
+    console.error("Error al obtener vehículos:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -40,6 +45,7 @@ exports.findOne = async (req, res) => {
 
     res.status(200).json(vehiculo)
   } catch (error) {
+    console.error("Error al obtener vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -69,6 +75,7 @@ exports.create = async (req, res) => {
 
     res.status(201).json(vehiculo)
   } catch (error) {
+    console.error("Error al crear vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -106,6 +113,7 @@ exports.update = async (req, res) => {
 
     res.status(200).json(vehiculo)
   } catch (error) {
+    console.error("Error al actualizar vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -123,6 +131,7 @@ exports.delete = async (req, res) => {
 
     res.status(200).json({ message: "Vehículo eliminado correctamente" })
   } catch (error) {
+    console.error("Error al eliminar vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -187,6 +196,7 @@ exports.search = async (req, res) => {
 
     res.status(200).json(vehiculos)
   } catch (error) {
+    console.error("Error en búsqueda de vehículos:", error)
     res.status(500).json({ message: error.message })
   }
 }

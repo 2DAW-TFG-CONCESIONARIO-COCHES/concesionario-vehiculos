@@ -7,8 +7,8 @@ const { verifyToken, isAdmin } = require("../middleware/auth.middleware")
 router.get("/", modeloController.findAll)
 router.get("/:id", modeloController.findOne)
 router.get("/marca/:marcaId", modeloController.findByMarca)
-router.post("/", [verifyToken, isAdmin], modeloController.create)
-router.put("/:id", [verifyToken, isAdmin], modeloController.update)
-router.delete("/:id", [verifyToken, isAdmin], modeloController.delete)
+router.post("/", [verifyToken], modeloController.create) // Empleados pueden crear
+router.put("/:id", [verifyToken], modeloController.update) // Empleados pueden actualizar
+router.delete("/:id", [verifyToken, isAdmin], modeloController.delete) // Solo admin puede eliminar
 
 module.exports = router

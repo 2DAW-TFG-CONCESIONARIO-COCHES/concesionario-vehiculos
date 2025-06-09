@@ -14,6 +14,11 @@ import PrivateRoute from "./components/PrivateRoute"
 import AdminRoute from "./components/AdminRoute"
 import NotFound from "./pages/NotFound"
 
+// Importar las nuevas páginas de empleados
+import EmpleadosList from "./pages/empleados/EmpleadosList"
+import EmpleadoForm from "./pages/empleados/EmpleadoForm"
+import ChangePassword from "./pages/empleados/ChangePassword"
+
 function App() {
   return (
     <div className="App">
@@ -92,6 +97,38 @@ function App() {
             element={
               <AdminRoute>
                 <ModeloForm />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/empleados"
+            element={
+              <AdminRoute>
+                <EmpleadosList />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/empleados/nuevo"
+            element={
+              <AdminRoute>
+                <EmpleadoForm />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/empleados/editar/:id"
+            element={
+              <AdminRoute>
+                <EmpleadoForm />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/empleados/password/:id"
+            element={
+              <AdminRoute>
+                <ChangePassword />
               </AdminRoute>
             }
           />

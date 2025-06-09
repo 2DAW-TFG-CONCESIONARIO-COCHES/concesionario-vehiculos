@@ -1,11 +1,11 @@
 import axios from "axios"
 
-// Crear instancia de axios
+// Crear instancia de axios con la URL completa del backend
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: "http://localhost:5000/api",
 })
 
-// Interceptor para añadir el token a las peticiones
+// Para añadir el token a las peticiones
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token")
@@ -46,6 +46,16 @@ export const vehiculoService = {
   create: (data) => api.post("/vehiculos", data),
   update: (id, data) => api.put(`/vehiculos/${id}`, data),
   delete: (id) => api.delete(`/vehiculos/${id}`),
+}
+
+// Servicios para empleados (solo dispponibe para admin)
+export const empleadoService = {
+  getAll: () => api.get("/empleados"),
+  getById: (id) => api.get(`/empleados/${id}`),
+  create: (data) => api.post("/empleados", data),
+  update: (id, data) => api.put(`/empleados/${id}`, data),
+  delete: (id) => api.delete(`/empleados/${id}`),
+  changePassword: (id, newPassword) => api.put(`/empleados/${id}/password`, { newPassword }),
 }
 
 export default api

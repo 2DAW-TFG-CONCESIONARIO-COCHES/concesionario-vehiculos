@@ -28,6 +28,7 @@ const Navbar = () => {
                 <>
                   <Link to="/marcas">Marcas</Link>
                   <Link to="/modelos">Modelos</Link>
+                  <Link to="/empleados">Empleados</Link>
                 </>
               )}
               <span>Hola, {user?.nombre}</span>
