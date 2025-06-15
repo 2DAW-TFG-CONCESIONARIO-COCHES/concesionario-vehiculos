@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { vehiculoService } from "../../services/api"
 
 const VehiculosList = () => {
@@ -19,22 +19,51 @@ const VehiculosList = () => {
     precioMax: "",
   })
 
-  useEffect(() => {
-    const fetchVehiculos = async () => {
-      try {
-        setLoading(true)
-        const response = await vehiculoService.getAll()
-        setVehiculos(response.data)
-        setLoading(false)
-      } catch (err) {
-        setError("Error al cargar los vehículos")
-        setLoading(false)
-        console.error(err)
-      }
-    }
+  // Obtener parámetros de la URL
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const marcaParam = queryParams.get("marca")
 
-    fetchVehiculos()
-  }, [])
+  useEffect(() => {
+    // Si hay un parámetro de marca en la URL, establecerlo en los filtros
+    if (marcaParam) {
+      setFiltros((prevFiltros) => ({
+        ...prevFiltros,
+        marca: marcaParam,
+      }))
+
+      // Aplicar el filtro automáticamente
+      fetchVehiculosConFiltro({ marca: marcaParam })
+    } else {
+      fetchVehiculos()
+    }
+  }, [marcaParam])
+
+  const fetchVehiculos = async () => {
+    try {
+      setLoading(true)
+      const response = await vehiculoService.getAll()
+      setVehiculos(response.data)
+      setLoading(false)
+    } catch (err) {
+      setError("Error al cargar los vehículos")
+      setLoading(false)
+      console.error(err)
+    }
+  }
+
+  const fetchVehiculosConFiltro = async (filtrosAplicar) => {
+    try {
+      setLoading(true)
+      const response = await vehiculoService.search(filtrosAplicar)
+      setVehiculos(response.data)
+      setLoading(false)
+    } catch (err) {
+      setError("Error al aplicar los filtros")
+      setLoading(false)
+      console.error(err)
+    }
+  }
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este vehículo?")) {
@@ -155,7 +184,7 @@ const VehiculosList = () => {
     <div className="vehiculos-container">
       <div className="container">
         <div className="vehiculos-header">
-          <h1 className="vehiculos-title">Catálogo de Vehículos</h1>
+          <h1 className="vehiculos-title">{marcaParam ? `Vehículos de ${marcaParam}` : "Catálogo de Vehículos"}</h1>
           <div className="vehiculos-actions">
             <Link to="/vehiculos/nuevo" className="btn btn-primary">
               <svg
@@ -192,6 +221,34 @@ const VehiculosList = () => {
             </button>
           </div>
         </div>
+
+        {/* Mostrar un mensaje si estamos filtrando por marca */}
+        {marcaParam && (
+          <div className="filter-active-message">
+            <div className="alert alert-info d-flex align-items-center justify-content-between">
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "8px" }}
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                Mostrando vehículos de la marca: <strong>{marcaParam}</strong>
+              </span>
+              <Link to="/vehiculos" className="btn btn-sm btn-outline-primary">
+                Ver todos los vehículos
+              </Link>
+            </div>
+          </div>
+        )}
 
         <div className={`filtros-panel ${showFilters ? "visible" : "hidden"}`}>
           <div className="filtros-header">

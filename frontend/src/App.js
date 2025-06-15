@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
+import ConnectionStatus from "./components/ConnectionStatus"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
@@ -13,15 +14,12 @@ import VehiculoDetail from "./pages/vehiculos/VehiculoDetail"
 import PrivateRoute from "./components/PrivateRoute"
 import AdminRoute from "./components/AdminRoute"
 import NotFound from "./pages/NotFound"
-
-// Importar las nuevas páginas de empleados
-import EmpleadosList from "./pages/empleados/EmpleadosList"
-import EmpleadoForm from "./pages/empleados/EmpleadoForm"
-import ChangePassword from "./pages/empleados/ChangePassword"
+import UsuariosAdmin from "./pages/usuarios/UsuariosAdmin"
 
 function App() {
   return (
     <div className="App">
+      <ConnectionStatus />
       <Navbar />
       <div className="container">
         <Routes>
@@ -51,7 +49,7 @@ function App() {
             }
           />
 
-          {/* Rutas de administrador */}
+          {/* Rutas de administrador - CORREGIDAS */}
           <Route
             path="/marcas"
             element={
@@ -101,34 +99,10 @@ function App() {
             }
           />
           <Route
-            path="/empleados"
+            path="/usuarios"
             element={
               <AdminRoute>
-                <EmpleadosList />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/empleados/nuevo"
-            element={
-              <AdminRoute>
-                <EmpleadoForm />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/empleados/editar/:id"
-            element={
-              <AdminRoute>
-                <EmpleadoForm />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/empleados/password/:id"
-            element={
-              <AdminRoute>
-                <ChangePassword />
+                <UsuariosAdmin />
               </AdminRoute>
             }
           />

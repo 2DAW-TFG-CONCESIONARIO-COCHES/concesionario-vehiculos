@@ -134,20 +134,26 @@ const VehiculoDetail = () => {
         </div>
 
         <div className="vehiculo-detail-card">
-          <div className="vehiculo-detail-header">
-            <div
-              className={`vehiculo-badge ${getBadgeClass(vehiculo.estado)}`}
-              style={{ position: "absolute", top: "1rem", left: "2rem" }}
-            >
-              {getEstadoLabel(vehiculo.estado)}
+          {/* Header más compacto */}
+          <div className="vehiculo-detail-header-compact">
+            <div className="vehiculo-detail-header-content-compact">
+              <div className="vehiculo-detail-info-compact">
+                <div className="vehiculo-detail-title-compact">
+                  <h1>
+                    {vehiculo.Modelo?.Marca?.nombre} {vehiculo.Modelo?.nombre}
+                  </h1>
+                  <p className="vehiculo-detail-subtitle-compact">
+                    {vehiculo.Modelo?.anio} - {vehiculo.color}
+                  </p>
+                </div>
+                <div className="vehiculo-detail-price-compact">€{Number(vehiculo.precio).toLocaleString()}</div>
+              </div>
+              <div className="vehiculo-detail-badge-compact">
+                <div className={`vehiculo-badge-compact ${getBadgeClass(vehiculo.estado)}`}>
+                  {getEstadoLabel(vehiculo.estado)}
+                </div>
+              </div>
             </div>
-            <h1 className="vehiculo-detail-title">
-              {vehiculo.Modelo?.Marca?.nombre} {vehiculo.Modelo?.nombre}
-            </h1>
-            <p className="vehiculo-detail-subtitle">
-              {vehiculo.Modelo?.anio} - {vehiculo.color}
-            </p>
-            <div className="vehiculo-detail-price">€{Number(vehiculo.precio).toLocaleString()}</div>
           </div>
 
           <div className="vehiculo-detail-body">
@@ -174,49 +180,246 @@ const VehiculoDetail = () => {
               )}
             </div>
 
-            {/* Especificaciones */}
+            {/* Especificaciones mejoradas */}
             <div className="vehiculo-detail-section">
-              <h2 className="vehiculo-detail-section-title">Especificaciones</h2>
-              <div className="vehiculo-detail-specs">
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Marca</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.Modelo?.Marca?.nombre}</span>
+              <h2 className="vehiculo-detail-section-title">Especificaciones Técnicas</h2>
+              <div className="vehiculo-detail-specs-enhanced">
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Marca</span>
+                    <span className="spec-value">{vehiculo.Modelo?.Marca?.nombre}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Modelo</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.Modelo?.nombre}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Modelo</span>
+                    <span className="spec-value">{vehiculo.Modelo?.nombre}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Año</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.Modelo?.anio}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Año</span>
+                    <span className="spec-value">{vehiculo.Modelo?.anio}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Color</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.color}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 2a7 7 0 1 0 10 10"></path>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Color</span>
+                    <span className="spec-value">{vehiculo.color}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Combustible</span>
-                  <span className="vehiculo-detail-spec-value">{getCombustibleLabel(vehiculo.combustible)}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="3" y1="22" x2="21" y2="22"></line>
+                      <line x1="6" y1="18" x2="6" y2="11"></line>
+                      <line x1="10" y1="18" x2="10" y2="11"></line>
+                      <line x1="14" y1="18" x2="14" y2="11"></line>
+                      <line x1="18" y1="18" x2="18" y2="13"></line>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Combustible</span>
+                    <span className="spec-value">{getCombustibleLabel(vehiculo.combustible)}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Transmisión</span>
-                  <span className="vehiculo-detail-spec-value">{getTransmisionLabel(vehiculo.transmision)}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M12 1v6m0 6v6"></path>
+                      <path d="M21 12h-6m-6 0H3"></path>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Transmisión</span>
+                    <span className="spec-value">{getTransmisionLabel(vehiculo.transmision)}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Kilometraje</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.kilometraje.toLocaleString()} km</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Kilometraje</span>
+                    <span className="spec-value">{vehiculo.kilometraje.toLocaleString()} km</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">VIN</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.vin}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">VIN</span>
+                    <span className="spec-value">{vehiculo.vin}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Estado</span>
-                  <span className="vehiculo-detail-spec-value">{getEstadoLabel(vehiculo.estado)}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 6L9 17l-5-5"></path>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Estado</span>
+                    <span className="spec-value">{getEstadoLabel(vehiculo.estado)}</span>
+                  </div>
                 </div>
-                <div className="vehiculo-detail-spec">
-                  <span className="vehiculo-detail-spec-label">Tipo</span>
-                  <span className="vehiculo-detail-spec-value">{vehiculo.Modelo?.tipo}</span>
+
+                <div className="vehiculo-detail-spec-enhanced">
+                  <div className="spec-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path>
+                    </svg>
+                  </div>
+                  <div className="spec-content">
+                    <span className="spec-label">Tipo</span>
+                    <span className="spec-value">{vehiculo.Modelo?.tipo}</span>
+                  </div>
                 </div>
               </div>
             </div>

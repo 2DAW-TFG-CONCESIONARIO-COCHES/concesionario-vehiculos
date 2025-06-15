@@ -17,7 +17,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container container">
         <div className="navbar-logo">
-          <Link to="/">Concesionario</Link>
+          <Link to="/">Concesionario Batoi</Link>
         </div>
         <div className="navbar-links">
           <Link to="/vehiculos">Vehículos</Link>
@@ -28,19 +28,18 @@ const Navbar = () => {
                 <>
                   <Link to="/marcas">Marcas</Link>
                   <Link to="/modelos">Modelos</Link>
-                  <Link to="/empleados">Empleados</Link>
+                  <Link to="/usuarios">Usuarios</Link>
                 </>
               )}
-              <span>Hola, {user?.nombre}</span>
-              <button onClick={handleLogout} className="btn btn-link">
+              <span className="user-greeting">Hola, {user?.nombre}</span>
+              <button onClick={handleLogout} className="btn btn-logout">
                 Cerrar sesión
               </button>
             </>
           ) : (
-            <>
-              <Link to="/login">Iniciar sesión</Link>
-              <Link to="/register">Registrarse</Link>
-            </>
+            <Link to="/login" className="btn btn-login">
+              Iniciar sesión
+            </Link>
           )}
         </div>
       </div>
