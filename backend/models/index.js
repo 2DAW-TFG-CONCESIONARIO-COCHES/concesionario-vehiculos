@@ -15,9 +15,11 @@ Vehiculo.belongsTo(Modelo, { foreignKey: "modeloId" })
 const syncDatabase = async () => {
   try {
     await sequelize.sync({ alter: true })
-    console.log("Base de datos sincronizada correctamente")
+    console.log("✅ Base de datos sincronizada correctamente")
+    return true
   } catch (error) {
-    console.error("Error al sincronizar la base de datos:", error)
+    console.error("❌ Error al sincronizar la base de datos:", error.message)
+    return false
   }
 }
 

@@ -56,7 +56,12 @@ const Usuario = sequelize.define(
 
 // Método para comparar contraseñas
 Usuario.prototype.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.password)
+  try {
+    return await bcrypt.compare(password, this.password)
+  } catch (error) {
+    console.error("Error al comparar contraseñas:", error)
+    return false
+  }
 }
 
 module.exports = Usuario

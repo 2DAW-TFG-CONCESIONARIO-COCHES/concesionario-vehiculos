@@ -6,8 +6,6 @@ const { Op } = require("sequelize")
 // Obtener todos los vehículos
 exports.findAll = async (req, res) => {
   try {
-    console.log("Obteniendo todos los vehículos...") // Para debug
-
     const vehiculos = await Vehiculo.findAll({
       include: [
         {
@@ -17,11 +15,8 @@ exports.findAll = async (req, res) => {
         },
       ],
     })
-
-    console.log(`Se encontraron ${vehiculos.length} vehículos`) // Para debug
     res.status(200).json(vehiculos)
   } catch (error) {
-    console.error("Error al obtener vehículos:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -45,7 +40,6 @@ exports.findOne = async (req, res) => {
 
     res.status(200).json(vehiculo)
   } catch (error) {
-    console.error("Error al obtener vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -75,7 +69,6 @@ exports.create = async (req, res) => {
 
     res.status(201).json(vehiculo)
   } catch (error) {
-    console.error("Error al crear vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -113,7 +106,6 @@ exports.update = async (req, res) => {
 
     res.status(200).json(vehiculo)
   } catch (error) {
-    console.error("Error al actualizar vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -131,24 +123,28 @@ exports.delete = async (req, res) => {
 
     res.status(200).json({ message: "Vehículo eliminado correctamente" })
   } catch (error) {
-    console.error("Error al eliminar vehículo:", error)
     res.status(500).json({ message: error.message })
   }
 }
 
-// Buscar vehículos por filtros
+// Buscar vehículos por filtros - MEJORADO
 exports.search = async (req, res) => {
   try {
     const { marca, modelo, estado, combustible, transmision, precioMin, precioMax } = req.query
 
     const whereCondition = {}
-    const includeCondition = [
-      {
-        model: Modelo,
-        attributes: ["id", "nombre", "anio", "tipo"],
-        include: [{ model: Marca, attributes: ["id", "nombre"] }],
-      },
-    ]
+    const includeCondition = {
+      model: Modelo,
+      attributes: ["id", "nombre", "anio", "tipo"],
+      include: [
+        {
+          model: Marca,
+          attributes: ["id", "nombre"],
+          where: {}, // Inicializar where para Marca
+        },
+      ],
+      where: {}, // Inicializar where para Modelo
+    }
 
     // Filtrar por estado
     if (estado) {
@@ -180,18 +176,33 @@ exports.search = async (req, res) => {
       }
     }
 
-    // Filtrar por marca y modelo
+    // Filtrar por marca - MEJORADO
     if (marca) {
-      includeCondition[0].include[0].where = { nombre: { [Op.like]: `%${marca}%` } }
+      includeCondition.include[0].where.nombre = {
+        [Op.like]: `%${marca}%`,
+      }
+      // Hacer que la relación sea requerida para que solo devuelva vehículos con esa marca
+      includeCondition.include[0].required = true
     }
 
+    // Filtrar por modelo - MEJORADO
     if (modelo) {
-      includeCondition[0].where = { nombre: { [Op.like]: `%${modelo}%` } }
+      includeCondition.where.nombre = {
+        [Op.like]: `%${modelo}%`,
+      }
+      includeCondition.required = true
+    }
+
+    if (!marca) {
+      includeCondition.include[0].required = false
+    }
+    if (!modelo) {
+      includeCondition.required = false
     }
 
     const vehiculos = await Vehiculo.findAll({
       where: whereCondition,
-      include: includeCondition,
+      include: [includeCondition],
     })
 
     res.status(200).json(vehiculos)
