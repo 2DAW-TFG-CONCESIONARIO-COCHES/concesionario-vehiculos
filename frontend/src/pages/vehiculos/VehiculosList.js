@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from "react"
 import { Link } from "react-router-dom"
 import { vehiculoService } from "../../services/api"
 import { AuthContext } from "../../context/AuthContext"
+import VehiculoPlaceholder from "../../components/VehiculoPlaceholder"
 
 const VehiculosList = () => {
   const { user } = useContext(AuthContext)
@@ -499,15 +500,23 @@ const VehiculosList = () => {
                 <div className={`vehiculo-badge ${getBadgeClass(vehiculo.estado)}`}>
                   {getEstadoLabel(vehiculo.estado)}
                 </div>
-                <img
-                  src={
-                    vehiculo.imagenes && vehiculo.imagenes.length > 0
-                      ? vehiculo.imagenes[0]
-                      : `/placeholder.svg?height=400&width=600&query=car+${vehiculo.color}`
-                  }
-                  alt={`${vehiculo.Modelo?.Marca?.nombre} ${vehiculo.Modelo?.nombre}`}
-                  className="vehiculo-image"
-                />
+
+                {/* Usar el nuevo componente placeholder o imagen real */}
+                {vehiculo.imagenes && vehiculo.imagenes.length > 0 ? (
+                  <img
+                    src={vehiculo.imagenes[0] || "/placeholder.svg"}
+                    alt={`${vehiculo.Modelo?.Marca?.nombre} ${vehiculo.Modelo?.nombre}`}
+                    className="vehiculo-image"
+                  />
+                ) : (
+                  <VehiculoPlaceholder
+                    tipo={vehiculo.Modelo?.tipo}
+                    color={vehiculo.color}
+                    marca={vehiculo.Modelo?.Marca?.nombre}
+                    modelo={vehiculo.Modelo?.nombre}
+                  />
+                )}
+
                 <div className="vehiculo-content">
                   <h3 className="vehiculo-title">
                     {vehiculo.Modelo?.Marca?.nombre} {vehiculo.Modelo?.nombre}

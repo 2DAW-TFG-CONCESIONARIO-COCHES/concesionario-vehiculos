@@ -500,14 +500,6 @@ const seedDatabase = async () => {
     console.log(`   Vendidos: ${vehiculosVendidos}`)
 
     console.log("\n🎉 ¡Base de datos poblada exitosamente!")
-    console.log("\n🔑 CREDENCIALES DE ACCESO:")
-    console.log("==========================")
-    console.log("👨‍💼 Administrador:")
-    console.log("   Email: admin@concesionario.com")
-    console.log("   Contraseña: admin123")
-    console.log("\n👨‍💻 Empleado:")
-    console.log("   Email: empleado@concesionario.com")
-    console.log("   Contraseña: empleado123")
   } catch (error) {
     console.error("❌ Error poblando la base de datos:", error)
   } finally {
