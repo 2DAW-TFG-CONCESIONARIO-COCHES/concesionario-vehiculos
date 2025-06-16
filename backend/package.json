@@ -8,7 +8,13 @@
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-admin": "node scripts/create-admin.js",
-    "test-api": "node scripts/test-connection.js"
+    "test-api": "node scripts/test-connection.js",
+    "test-db": "node scripts/test-db-connection.js",
+    "check-db": "node scripts/check-connection.js",
+    "seed": "node scripts/seed-database.js",
+    "seed-quick": "node scripts/quick-seed.js",
+    "clear-db": "node scripts/clear-database.js",
+    "reset-db": "npm run clear-db && npm run seed"
   },
   "keywords": ["concesionario", "vehiculos", "api", "express", "mysql"],
   "author": "",
