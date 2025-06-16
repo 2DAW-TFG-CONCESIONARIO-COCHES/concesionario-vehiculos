@@ -24,11 +24,11 @@ const Navbar = () => {
 
           {isAuthenticated() ? (
             <>
-              {isAdmin() && (
+              {isAuthenticated() && (
                 <>
                   <Link to="/marcas">Marcas</Link>
                   <Link to="/modelos">Modelos</Link>
-                  <Link to="/usuarios">Usuarios</Link>
+                  {isAdmin() && <Link to="/usuarios">Usuarios</Link>}
                 </>
               )}
               <span className="user-greeting">Hola, {user?.nombre}</span>

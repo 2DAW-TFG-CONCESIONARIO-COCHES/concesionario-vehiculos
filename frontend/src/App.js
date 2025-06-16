@@ -31,13 +31,13 @@ function App() {
           <Route path="/vehiculos" element={<VehiculosList />} />
           <Route path="/vehiculos/:id" element={<VehiculoDetail />} />
 
-          {/* Rutas privadas (requieren autenticación) */}
+          {/* Rutas de vehículos - EMPLEADOS PUEDEN EDITAR, SOLO ADMINS PUEDEN CREAR */}
           <Route
             path="/vehiculos/nuevo"
             element={
-              <PrivateRoute>
+              <AdminRoute>
                 <VehiculoForm />
-              </PrivateRoute>
+              </AdminRoute>
             }
           />
           <Route
@@ -49,13 +49,13 @@ function App() {
             }
           />
 
-          {/* Rutas de administrador - CORREGIDAS */}
+          {/* Rutas de marcas - EMPLEADOS PUEDEN VER, SOLO ADMINS PUEDEN GESTIONAR */}
           <Route
             path="/marcas"
             element={
-              <AdminRoute>
+              <PrivateRoute>
                 <MarcasList />
-              </AdminRoute>
+              </PrivateRoute>
             }
           />
           <Route
@@ -74,12 +74,14 @@ function App() {
               </AdminRoute>
             }
           />
+
+          {/* Rutas de modelos - EMPLEADOS PUEDEN VER, SOLO ADMINS PUEDEN GESTIONAR */}
           <Route
             path="/modelos"
             element={
-              <AdminRoute>
+              <PrivateRoute>
                 <ModelosList />
-              </AdminRoute>
+              </PrivateRoute>
             }
           />
           <Route
@@ -98,6 +100,8 @@ function App() {
               </AdminRoute>
             }
           />
+
+          {/* Rutas de administrador */}
           <Route
             path="/usuarios"
             element={
