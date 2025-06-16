@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { vehiculoService } from "../../services/api"
 
 const VehiculosList = () => {
   const [vehiculos, setVehiculos] = useState([])
+  const [vehiculosFiltrados, setVehiculosFiltrados] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -19,57 +20,79 @@ const VehiculosList = () => {
     precioMax: "",
   })
 
-  // Obtener parámetros de la URL
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const marcaParam = queryParams.get("marca")
-
   useEffect(() => {
-    // Si hay un parámetro de marca en la URL, establecerlo en los filtros
-    if (marcaParam) {
-      setFiltros((prevFiltros) => ({
-        ...prevFiltros,
-        marca: marcaParam,
-      }))
-
-      // Aplicar el filtro automáticamente
-      fetchVehiculosConFiltro({ marca: marcaParam })
-    } else {
-      fetchVehiculos()
+    const fetchVehiculos = async () => {
+      try {
+        setLoading(true)
+        const response = await vehiculoService.getAll()
+        setVehiculos(response.data)
+        setVehiculosFiltrados(response.data)
+        setLoading(false)
+      } catch (err) {
+        setError("Error al cargar los vehículos")
+        setLoading(false)
+        console.error(err)
+      }
     }
-  }, [marcaParam])
 
-  const fetchVehiculos = async () => {
-    try {
-      setLoading(true)
-      const response = await vehiculoService.getAll()
-      setVehiculos(response.data)
-      setLoading(false)
-    } catch (err) {
-      setError("Error al cargar los vehículos")
-      setLoading(false)
-      console.error(err)
-    }
-  }
+    fetchVehiculos()
+  }, [])
 
-  const fetchVehiculosConFiltro = async (filtrosAplicar) => {
-    try {
-      setLoading(true)
-      const response = await vehiculoService.search(filtrosAplicar)
-      setVehiculos(response.data)
-      setLoading(false)
-    } catch (err) {
-      setError("Error al aplicar los filtros")
-      setLoading(false)
-      console.error(err)
-    }
+  // Efecto para filtrar vehículos cuando cambien los filtros
+  useEffect(() => {
+    filtrarVehiculos()
+  }, [filtros, vehiculos])
+
+  const filtrarVehiculos = () => {
+    const vehiculosFiltrados = vehiculos.filter((vehiculo) => {
+      // Filtro por marca
+      if (filtros.marca && !vehiculo.Modelo?.Marca?.nombre?.toLowerCase().includes(filtros.marca.toLowerCase())) {
+        return false
+      }
+
+      // Filtro por modelo
+      if (filtros.modelo && !vehiculo.Modelo?.nombre?.toLowerCase().includes(filtros.modelo.toLowerCase())) {
+        return false
+      }
+
+      // Filtro por estado
+      if (filtros.estado && vehiculo.estado !== filtros.estado) {
+        return false
+      }
+
+      // Filtro por combustible
+      if (filtros.combustible && vehiculo.combustible !== filtros.combustible) {
+        return false
+      }
+
+      // Filtro por transmisión
+      if (filtros.transmision && vehiculo.transmision !== filtros.transmision) {
+        return false
+      }
+
+      // Filtro por precio mínimo
+      if (filtros.precioMin && Number(vehiculo.precio) < Number(filtros.precioMin)) {
+        return false
+      }
+
+      // Filtro por precio máximo
+      if (filtros.precioMax && Number(vehiculo.precio) > Number(filtros.precioMax)) {
+        return false
+      }
+
+      return true
+    })
+
+    setVehiculosFiltrados(vehiculosFiltrados)
   }
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este vehículo?")) {
       try {
         await vehiculoService.delete(id)
-        setVehiculos(vehiculos.filter((vehiculo) => vehiculo.id !== id))
+        const nuevosVehiculos = vehiculos.filter((vehiculo) => vehiculo.id !== id)
+        setVehiculos(nuevosVehiculos)
+        // vehiculosFiltrados se actualizará automáticamente por el useEffect
       } catch (err) {
         setError("Error al eliminar el vehículo")
         console.error(err)
@@ -84,21 +107,12 @@ const VehiculosList = () => {
     })
   }
 
-  const aplicarFiltros = async () => {
-    try {
-      setLoading(true)
-      const response = await vehiculoService.search(filtros)
-      setVehiculos(response.data)
-      setLoading(false)
-      setShowFilters(false)
-    } catch (err) {
-      setError("Error al aplicar los filtros")
-      setLoading(false)
-      console.error(err)
-    }
+  const aplicarFiltros = () => {
+    setShowFilters(false)
+    // Los filtros se aplican automáticamente por el useEffect
   }
 
-  const limpiarFiltros = async () => {
+  const limpiarFiltros = () => {
     setFiltros({
       marca: "",
       modelo: "",
@@ -108,17 +122,7 @@ const VehiculosList = () => {
       precioMin: "",
       precioMax: "",
     })
-
-    try {
-      setLoading(true)
-      const response = await vehiculoService.getAll()
-      setVehiculos(response.data)
-      setLoading(false)
-    } catch (err) {
-      setError("Error al cargar los vehículos")
-      setLoading(false)
-      console.error(err)
-    }
+    setShowFilters(false)
   }
 
   const getEstadoLabel = (estado) => {
@@ -184,7 +188,7 @@ const VehiculosList = () => {
     <div className="vehiculos-container">
       <div className="container">
         <div className="vehiculos-header">
-          <h1 className="vehiculos-title">{marcaParam ? `Vehículos de ${marcaParam}` : "Catálogo de Vehículos"}</h1>
+          <h1 className="vehiculos-title">Catálogo de Vehículos</h1>
           <div className="vehiculos-actions">
             <Link to="/vehiculos/nuevo" className="btn btn-primary">
               <svg
@@ -221,34 +225,6 @@ const VehiculosList = () => {
             </button>
           </div>
         </div>
-
-        {/* Mostrar un mensaje si estamos filtrando por marca */}
-        {marcaParam && (
-          <div className="filter-active-message">
-            <div className="alert alert-info d-flex align-items-center justify-content-between">
-              <span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ marginRight: "8px" }}
-                >
-                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                </svg>
-                Mostrando vehículos de la marca: <strong>{marcaParam}</strong>
-              </span>
-              <Link to="/vehiculos" className="btn btn-sm btn-outline-primary">
-                Ver todos los vehículos
-              </Link>
-            </div>
-          </div>
-        )}
 
         <div className={`filtros-panel ${showFilters ? "visible" : "hidden"}`}>
           <div className="filtros-header">
@@ -444,7 +420,41 @@ const VehiculosList = () => {
           </div>
         </div>
 
-        {vehiculos.length === 0 ? (
+        {!showFilters &&
+          (filtros.marca ||
+            filtros.modelo ||
+            filtros.estado ||
+            filtros.combustible ||
+            filtros.transmision ||
+            filtros.precioMin ||
+            filtros.precioMax) && (
+            <div className="vehiculos-filtro-resultado">
+              <div className="filtro-resultado-container">
+                <span className="filtro-resultado-texto">
+                  Mostrando {vehiculosFiltrados.length} de {vehiculos.length} vehículos
+                </span>
+                <button onClick={limpiarFiltros} className="filtro-limpiar-btn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  Limpiar filtros
+                </button>
+              </div>
+            </div>
+          )}
+
+        {vehiculosFiltrados.length === 0 ? (
           <div className="text-center py-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -462,15 +472,21 @@ const VehiculosList = () => {
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            <h3>No hay vehículos disponibles</h3>
-            <p className="text-muted">No se encontraron vehículos que coincidan con los criterios de búsqueda.</p>
-            <button onClick={limpiarFiltros} className="btn btn-primary mt-3">
-              Limpiar filtros
-            </button>
+            <h3>{vehiculos.length === 0 ? "No hay vehículos disponibles" : "No se encontraron vehículos"}</h3>
+            <p className="text-muted">
+              {vehiculos.length === 0
+                ? "No se encontraron vehículos en el sistema."
+                : "No se encontraron vehículos que coincidan con los criterios de búsqueda."}
+            </p>
+            {vehiculos.length > 0 && (
+              <button onClick={limpiarFiltros} className="btn btn-primary mt-3">
+                Limpiar filtros
+              </button>
+            )}
           </div>
         ) : (
           <div className="vehiculos-grid">
-            {vehiculos.map((vehiculo) => (
+            {vehiculosFiltrados.map((vehiculo) => (
               <div key={vehiculo.id} className="vehiculo-card">
                 <div className={`vehiculo-badge ${getBadgeClass(vehiculo.estado)}`}>
                   {getEstadoLabel(vehiculo.estado)}
