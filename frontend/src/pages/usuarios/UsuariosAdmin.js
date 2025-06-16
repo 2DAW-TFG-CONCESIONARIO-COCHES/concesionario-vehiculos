@@ -22,6 +22,9 @@ const UsuariosAdmin = () => {
     rol: "empleado",
   })
 
+  const [filtroNombre, setFiltroNombre] = useState("")
+  const [filtroRol, setFiltroRol] = useState("")
+
   useEffect(() => {
     fetchUsuarios()
     fetchStats()
@@ -47,6 +50,20 @@ const UsuariosAdmin = () => {
     } catch (err) {
       console.error("Error al cargar estadísticas:", err)
     }
+  }
+
+  const usuariosFiltrados = usuarios.filter((usuario) => {
+    const coincideNombre =
+      usuario.nombre.toLowerCase().includes(filtroNombre.toLowerCase()) ||
+      usuario.apellidos.toLowerCase().includes(filtroNombre.toLowerCase()) ||
+      usuario.email.toLowerCase().includes(filtroNombre.toLowerCase())
+    const coincideRol = filtroRol === "" || usuario.rol === filtroRol
+    return coincideNombre && coincideRol
+  })
+
+  const limpiarFiltros = () => {
+    setFiltroNombre("")
+    setFiltroRol("")
   }
 
   const handleDelete = async (id) => {
@@ -196,6 +213,79 @@ const UsuariosAdmin = () => {
           </div>
         )}
 
+        {/* Filtro de usuarios */}
+        <div className="usuarios-filtro">
+          <div className="filtro-usuario-container">
+            <div className="filtro-usuario-header">
+              <div className="filtro-usuario-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+              </div>
+              <h3 className="filtro-usuario-title">Filtrar Usuarios</h3>
+              {(filtroNombre || filtroRol) && (
+                <button onClick={limpiarFiltros} className="filtro-limpiar-btn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+
+            <div className="filtro-usuario-content">
+              <div className="filtro-busqueda">
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, apellidos o email..."
+                  value={filtroNombre}
+                  onChange={(e) => setFiltroNombre(e.target.value)}
+                  className="filtro-busqueda-input"
+                />
+              </div>
+
+              <div className="filtro-rol">
+                <select value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)} className="filtro-rol-select">
+                  <option value="">Todos los roles</option>
+                  <option value="admin">Administradores</option>
+                  <option value="empleado">Empleados</option>
+                </select>
+              </div>
+
+              {(filtroNombre || filtroRol) && (
+                <div className="filtro-resultado">
+                  <span className="filtro-resultado-texto">
+                    {usuariosFiltrados.length} usuario{usuariosFiltrados.length !== 1 ? "s" : ""} encontrado
+                    {usuariosFiltrados.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Estadísticas */}
         {stats && (
           <div className="stats-container">
@@ -296,14 +386,23 @@ const UsuariosAdmin = () => {
           </div>
         )}
 
-        {usuarios.length === 0 ? (
+        {usuariosFiltrados.length === 0 ? (
           <div className="text-center py-5">
-            <h3>No hay usuarios registrados</h3>
-            <p className="text-muted">Los usuarios aparecerán aquí cuando se registren en el sistema.</p>
+            {usuarios.length === 0 ? (
+              <>
+                <h3>No hay usuarios registrados</h3>
+                <p className="text-muted">Los usuarios aparecerán aquí cuando se registren en el sistema.</p>
+              </>
+            ) : (
+              <>
+                <h3>No se encontraron usuarios</h3>
+                <p className="text-muted">No hay usuarios que coincidan con los filtros aplicados.</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="usuarios-grid">
-            {usuarios.map((usuario) => (
+            {usuariosFiltrados.map((usuario) => (
               <div key={usuario.id} className="usuario-card">
                 <div className="usuario-header">
                   <div className="usuario-avatar">

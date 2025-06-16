@@ -2,27 +2,32 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { modeloService } from "../../services/api"
+import { modeloService, marcaService } from "../../services/api"
 
 const ModelosList = () => {
   const [modelos, setModelos] = useState([])
+  const [marcas, setMarcas] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [filtroMarca, setFiltroMarca] = useState("") // Estado para el filtro de marca
 
   useEffect(() => {
-    const fetchModelos = async () => {
+    const fetchData = async () => {
       try {
-        const response = await modeloService.getAll()
-        setModelos(response.data)
+        // Cargar modelos y marcas en paralelo
+        const [modelosResponse, marcasResponse] = await Promise.all([modeloService.getAll(), marcaService.getAll()])
+
+        setModelos(modelosResponse.data)
+        setMarcas(marcasResponse.data)
         setLoading(false)
       } catch (err) {
-        setError("Error al cargar los modelos")
+        setError("Error al cargar los datos")
         setLoading(false)
         console.error(err)
       }
     }
 
-    fetchModelos()
+    fetchData()
   }, [])
 
   const handleDelete = async (id) => {
@@ -36,6 +41,19 @@ const ModelosList = () => {
       }
     }
   }
+
+  const handleFiltroMarcaChange = (e) => {
+    setFiltroMarca(e.target.value)
+  }
+
+  const limpiarFiltro = () => {
+    setFiltroMarca("")
+  }
+
+  // Filtrar modelos basándose en la marca seleccionada
+  const modelosFiltrados = filtroMarca
+    ? modelos.filter((modelo) => modelo.Marca?.id.toString() === filtroMarca)
+    : modelos
 
   const getTipoLabel = (tipo) => {
     const tipos = {
@@ -101,7 +119,72 @@ const ModelosList = () => {
           </Link>
         </div>
 
-        {modelos.length === 0 ? (
+        {/* Filtro por marca */}
+        <div className="modelos-filtro">
+          <div className="filtro-marca-container">
+            <div className="filtro-marca-header">
+              <div className="filtro-marca-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </div>
+              <h3 className="filtro-marca-title">Filtrar por Marca</h3>
+              {filtroMarca && (
+                <button onClick={limpiarFiltro} className="filtro-limpiar-btn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  Limpiar
+                </button>
+              )}
+            </div>
+
+            <div className="filtro-marca-content">
+              <select value={filtroMarca} onChange={handleFiltroMarcaChange} className="filtro-marca-select">
+                <option value="">Todas las marcas ({modelos.length} modelos)</option>
+                {marcas.map((marca) => {
+                  const modelosCount = modelos.filter((modelo) => modelo.Marca?.id === marca.id).length
+                  return (
+                    <option key={marca.id} value={marca.id}>
+                      {marca.nombre} ({modelosCount} modelo{modelosCount !== 1 ? "s" : ""})
+                    </option>
+                  )
+                })}
+              </select>
+
+              {filtroMarca && (
+                <div className="filtro-resultado">
+                  <span className="filtro-resultado-texto">
+                    Mostrando {modelosFiltrados.length} de {modelos.length} modelos
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {modelosFiltrados.length === 0 ? (
           <div className="text-center py-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -119,15 +202,25 @@ const ModelosList = () => {
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            <h3>No hay modelos registrados</h3>
-            <p className="text-muted">Los modelos aparecerán aquí cuando se registren en el sistema.</p>
-            <Link to="/modelos/nuevo" className="btn btn-primary mt-3">
-              Crear Primer Modelo
-            </Link>
+            <h3>{filtroMarca ? `No hay modelos para la marca seleccionada` : "No hay modelos registrados"}</h3>
+            <p className="text-muted">
+              {filtroMarca
+                ? "Prueba seleccionando otra marca o limpia el filtro para ver todos los modelos."
+                : "Los modelos aparecerán aquí cuando se registren en el sistema."}
+            </p>
+            {filtroMarca ? (
+              <button onClick={limpiarFiltro} className="btn btn-secondary mt-3">
+                Ver Todos los Modelos
+              </button>
+            ) : (
+              <Link to="/modelos/nuevo" className="btn btn-primary mt-3">
+                Crear Primer Modelo
+              </Link>
+            )}
           </div>
         ) : (
           <div className="modelos-grid">
-            {modelos.map((modelo) => (
+            {modelosFiltrados.map((modelo) => (
               <div key={modelo.id} className="modelo-card">
                 <div className="modelo-header">
                   <div className="modelo-icon">
