@@ -34,7 +34,7 @@ Sistema web para la gestión integral de un concesionario de vehículos, desarro
 - ✅ Búsqueda y filtrado avanzado de vehículos
 - ✅ Sistema de roles y permisos
 - ✅ Interfaz responsive para todos los dispositivos
-- ✅ Carga de imágenes para vehículos
+- ✅ Carga de imágenes para vehículos y logos de marcas
 - ✅ Dashboard administrativo
 - ✅ Gestión de usuarios (solo Admin)
 
@@ -46,16 +46,16 @@ Sistema web para la gestión integral de un concesionario de vehículos, desarro
 - **Node.js** v18+ (opcional, para desarrollo sin Docker)
 
 ### Verificar instalaciones:
-\`\`\`bash
+```bash
 docker --version
 docker-compose --version
 git --version
-\`\`\`
+```
 
 ### Pasos de instalación completos
 
 #### 1. **Clonar el repositorio**
-\`\`\`bash
+```bash
 # Clonar el repositorio
 git clone https://github.com/2DAW-TFG-CONCESIONARIO-COCHES/concesionario-vehiculos
 
@@ -64,10 +64,10 @@ cd concesionario-vehiculos
 
 # Verificar que tienes todos los archivos
 ls -la
-\`\`\`
+```
 
 #### 2. **Configurar variables de entorno**
-\`\`\`bash
+```bash
 # Copiar archivos de configuración
 cp .env.example .env
 cp frontend/.env.example frontend/.env
@@ -75,12 +75,12 @@ cp frontend/.env.example frontend/.env
 # Generar JWT Secret seguro (recomendado)
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 # Copiar el resultado y reemplazar JWT_SECRET en .env
-\`\`\`
+```
 
 **Nota:** Los valores por defecto están configurados para funcionar inmediatamente con Docker.
 
 #### 3. **Ejecutar con Docker**
-\`\`\`bash
+```bash
 # Limpiar contenedores anteriores (si existen)
 docker-compose down -v
 
@@ -89,26 +89,85 @@ docker-compose up --build
 
 # O ejecutar en segundo plano
 docker-compose up --build -d
-\`\`\`
+```
 
 #### 4. **Inicializar la base de datos**
-\`\`\`bash
 
-# Crear tablas y relaciones
-docker-compose exec backend node scripts/seed-database.js
+**Opción A: Scripts automáticos (Recomendado)**
+```bash
+# Crear estructura completa de base de datos (tablas y relaciones)
+docker-compose exec backend npm run create-structure
 
 # Crear usuario administrador por defecto
-docker-compose exec backend node scripts/create-admin.js
-\`\`\`
+docker-compose exec backend npm run create-admin
+
+# Sembrar datos de ejemplo (marcas, modelos, vehículos)
+docker-compose exec backend npm run seed-data
+
+# O hacer todo de una vez
+docker-compose exec backend npm run setup-db
+```
+
+**Opción B: Importación manual (En caso de errores)**
+```bash
+# Si los scripts automáticos fallan, puedes importar la base de datos directamente
+docker-compose exec -T db mysql -u root -proot_password < concesionario_db.sql
+
+# O usando phpMyAdmin:
+# 1. Accede a http://localhost:8080
+# 2. Usuario: root, Contraseña: root_password
+# 3. Importa el archivo concesionario_db.sql
+```
 
 #### 5. **Acceder a la aplicación**
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:5000
 - **phpMyAdmin:** http://localhost:8080
 
+## Scripts de Base de Datos Disponibles
+
+### Scripts principales
+```bash
+# Crear solo la estructura (tablas vacías)
+npm run create-structure
+
+# Crear estructura forzando recreación
+npm run create-structure-force
+
+# Crear usuario administrador
+npm run create-admin
+
+# Sembrar datos de ejemplo
+npm run seed-data
+
+# Setup completo (estructura + admin + datos)
+npm run setup-db
+
+# Limpiar toda la base de datos
+npm run clear-db
+
+# Probar conexión a base de datos
+npm run test-connection
+```
+
+### Credenciales por defecto
+**Usuario Administrador:**
+- **Email:** admin@concesionario.com
+- **Contraseña:** admin123
+
+**Base de Datos (phpMyAdmin):**
+- **Servidor:** db
+- **Usuario:** concesionario_user
+- **Contraseña:** concesionario_pass
+- **Base de datos:** concesionario_db
+
+**Root MySQL:**
+- **Usuario:** root
+- **Contraseña:** root_password
+
 ## Estructura del Proyecto
 
-\`\`\`
+```
 concesionario-vehiculos/
 ├── backend/                 # API REST con Node.js y Express
 │   ├── config/             # Configuración de base de datos
@@ -117,6 +176,10 @@ concesionario-vehiculos/
 │   ├── models/             # Modelos de Sequelize
 │   ├── routes/             # Rutas de la API
 │   ├── scripts/            # Scripts de utilidad y seeders
+│   │   ├── create-database-structure.js  # Crear estructura BD
+│   │   ├── create-admin.js               # Crear usuario admin
+│   │   ├── seed-sample-data.js           # Datos de ejemplo
+│   │   └── test-connection.js            # Probar conexión
 │   ├── uploads/            # Archivos subidos
 │   └── server.js           # Servidor principal
 ├── frontend/               # Aplicación React
@@ -129,11 +192,12 @@ concesionario-vehiculos/
 │   │   └── utils/          # Utilidades
 │   └── package.json        # Dependencias del frontend
 ├── database/               # Scripts SQL y migraciones
+│   └── concesionario_db.sql # Base de datos completa (backup)
 ├── scripts/                # Scripts de desarrollo
 ├── docker-compose.yml      # Configuración de Docker Compose
 ├── .env.example            # Variables de entorno de ejemplo
 └── README.md               # Este archivo
-\`\`\`
+```
 
 ## API Endpoints
 
@@ -168,22 +232,12 @@ concesionario-vehiculos/
 - `PUT /api/usuarios/:id` - Actualizar usuario (Admin)
 - `DELETE /api/usuarios/:id` - Eliminar usuario (Admin)
 
-### Base de Datos (phpMyAdmin)
-- **Servidor:** db
-- **Usuario:** concesionario_user
-- **Contraseña:** concesionario_pass
-- **Base de datos:** concesionario_db
-
-### Root MySQL
-- **Usuario:** root
-- **Contraseña:** root_password
-
 ## Desarrollo
 
 ### Comandos útiles
 
 #### Docker Compose
-\`\`\`bash
+```bash
 # Ver logs en tiempo real
 docker-compose logs -f
 
@@ -205,24 +259,42 @@ docker-compose up db phpmyadmin
 
 # Reiniciar un servicio específico
 docker-compose restart backend
-\`\`\`
+```
 
 #### Base de Datos
+```bash
 # Conectar a MySQL directamente
-docker-compose exec db mysql -u root -p
+docker-compose exec db mysql -u root -proot_password
 
 # Ejecutar scripts de utilidad
-docker-compose exec backend node scripts/test-db-connection.js
-docker-compose exec backend node scripts/clear-database.js
-docker-compose exec backend node scripts/quick-seed.js
+docker-compose exec backend node scripts/test-connection.js
+docker-compose exec backend node scripts/create-database-structure.js
+docker-compose exec backend node scripts/seed-sample-data.js
 
 # Backup de base de datos
-docker-compose exec db mysqldump -u root -p concesionario_db > backup.sql
+docker-compose exec db mysqldump -u root -proot_password concesionario_db > database/concesionario_db.sql
 
 # Restaurar backup
-docker-compose exec -T db mysql -u root -p concesionario_db < backup.sql
-\`\`\`
+docker-compose exec -T db mysql -u root -proot_password concesionario_db < database/concesionario_db.sql
+```
 
+#### Desarrollo sin Docker
+```bash
+# Backend
+cd backend
+npm install
+npm run dev
+
+# Frontend (en otra terminal)
+cd frontend
+npm install
+npm start
+```
+
+### Solución de Problemas
+
+#### Problemas comunes
+```bash
 # Limpiar Docker completamente
 docker-compose down -v
 docker system prune -a
@@ -230,8 +302,10 @@ docker volume prune
 
 # Reconstruir desde cero
 docker-compose up --build
-\`\`\`
+```
 
+#### Actualizar proyecto
+```bash
 # Obtener últimos cambios
 git pull origin main
 
@@ -240,16 +314,24 @@ docker-compose down
 docker-compose up --build
 
 # Actualizar base de datos si es necesario
-docker-compose exec backend node scripts/seed-database.js
-\`\`\`
+docker-compose exec backend npm run setup-db
+```
+
+#### Error en inicialización de BD
+Si los scripts automáticos fallan:
+1. Accede a phpMyAdmin (http://localhost:8080)
+2. Importa manualmente `database/concesionario_db.sql`
+3. O ejecuta: `docker-compose exec -T db mysql -u root -proot_password < database/concesionario_db.sql`
 
 ## Notas Importantes
 
 - **Primera ejecución:** Puede tardar 3-5 minutos en descargar imágenes Docker
 - **Datos persistentes:** Los datos de MySQL se guardan en un volumen Docker
 - **Hot reload:** Tanto frontend como backend tienen recarga automática
-- **Imágenes:** Las imágenes de vehículos se guardan en `backend/uploads/`
+- **Imágenes:** Las imágenes de vehículos y logos se guardan en `backend/uploads/`
 - **Puertos:** Asegúrate de que los puertos 3000, 5000, 3306 y 8080 estén libres
+- **Campo logo:** Configurado como LONGTEXT para soportar imágenes base64 grandes
+- **Backup incluido:** El archivo `database/concesionario_db.sql` contiene una copia completa de la BD
 
 ## Contribución
 

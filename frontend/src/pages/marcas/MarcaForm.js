@@ -66,9 +66,11 @@ const MarcaForm = () => {
 
     try {
       const file = files[0]
+      console.log("Archivo original:", file.name, "Tamaño:", file.size, "bytes")
 
       // Comprimir la imagen
       const compressedBlob = await compressImage(file, 400, 400, 0.8)
+      console.log("Imagen comprimida, tamaño:", compressedBlob.size, "bytes")
 
       // Crear URL para vista previa
       const imageUrl = URL.createObjectURL(compressedBlob)
@@ -76,6 +78,7 @@ const MarcaForm = () => {
 
       // Convertir a base64
       const base64 = await blobToBase64(compressedBlob)
+      console.log("Base64 generado, longitud:", base64.length, "caracteres")
 
       setFormData({
         ...formData,
@@ -123,17 +126,47 @@ const MarcaForm = () => {
     setLoading(true)
     setError(null)
 
+    // Preparar datos para enviar
+    const dataToSend = {
+      nombre: formData.nombre,
+      pais: formData.pais,
+      logo: formData.logo,
+    }
+
+    console.log("=== ENVIANDO DATOS DE MARCA ===")
+    console.log("ID:", id)
+    console.log("Datos:", {
+      nombre: dataToSend.nombre,
+      pais: dataToSend.pais,
+      logo: dataToSend.logo ? `Base64 de ${dataToSend.logo.length} caracteres` : "Sin logo",
+    })
+
     try {
       if (isEditing) {
-        await marcaService.update(id, formData)
+        console.log("Actualizando marca existente...")
+        await marcaService.update(id, dataToSend)
       } else {
-        await marcaService.create(formData)
+        console.log("Creando nueva marca...")
+        await marcaService.create(dataToSend)
       }
       navigate("/marcas")
     } catch (err) {
-      setError("Error al guardar la marca")
+      console.error("=== ERROR AL GUARDAR MARCA ===")
+      console.error("Error completo:", err)
+      console.error("Response:", err.response)
+
+      // Manejo específico de errores
+      if (err.response?.status === 500) {
+        setError("Error interno del servidor. Revisa los logs del backend para más detalles.")
+      } else if (err.response?.status === 400) {
+        setError("Datos inválidos: " + (err.response.data?.message || "Verifica los campos"))
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message)
+      } else {
+        setError("Error al guardar la marca: " + err.message)
+      }
+
       setLoading(false)
-      console.error(err)
     }
   }
 

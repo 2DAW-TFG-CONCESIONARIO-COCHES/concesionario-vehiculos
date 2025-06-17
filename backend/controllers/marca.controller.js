@@ -135,7 +135,7 @@ exports.update = async (req, res) => {
     await marca.update({
       nombre: nombre ? nombre.trim() : marca.nombre,
       pais: pais !== undefined ? (pais ? pais.trim() : null) : marca.pais,
-      logo: logo !== undefined ? (logo ? logo.trim() : null) : marca.logo,
+      logo: logo !== undefined ? logo || null : marca.logo,
     })
 
     console.log("Marca actualizada exitosamente:", marca.toJSON())
