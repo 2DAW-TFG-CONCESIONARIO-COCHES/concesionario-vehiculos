@@ -208,7 +208,6 @@ docker-compose restart backend
 \`\`\`
 
 #### Base de Datos
-\`\`\`bash
 # Conectar a MySQL directamente
 docker-compose exec db mysql -u root -p
 
@@ -224,8 +223,6 @@ docker-compose exec db mysqldump -u root -p concesionario_db > backup.sql
 docker-compose exec -T db mysql -u root -p concesionario_db < backup.sql
 \`\`\`
 
-#### Error: Contenedores no se conectan
-\`\`\`bash
 # Limpiar Docker completamente
 docker-compose down -v
 docker system prune -a
@@ -235,8 +232,6 @@ docker volume prune
 docker-compose up --build
 \`\`\`
 
-### Actualizar el Proyecto
-\`\`\`bash
 # Obtener últimos cambios
 git pull origin main
 
