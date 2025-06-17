@@ -54,6 +54,18 @@ exports.create = async (req, res) => {
       return res.status(404).json({ message: "Modelo no encontrado" })
     }
 
+    // Verificar si ya existe un vehículo con el mismo VIN
+    const vehiculoExistente = await Vehiculo.findOne({
+      where: { vin: req.body.vin },
+    })
+
+    if (vehiculoExistente) {
+      return res.status(400).json({
+        message: "Ya existe un vehículo con este número VIN",
+        field: "vin",
+      })
+    }
+
     const vehiculo = await Vehiculo.create({
       vin: req.body.vin,
       color: req.body.color,
@@ -67,8 +79,42 @@ exports.create = async (req, res) => {
       modeloId: req.body.modeloId,
     })
 
-    res.status(201).json(vehiculo)
+    // Obtener el vehículo creado con las relaciones
+    const vehiculoCompleto = await Vehiculo.findByPk(vehiculo.id, {
+      include: [
+        {
+          model: Modelo,
+          attributes: ["id", "nombre", "anio", "tipo"],
+          include: [{ model: Marca, attributes: ["id", "nombre"] }],
+        },
+      ],
+    })
+
+    res.status(201).json(vehiculoCompleto)
   } catch (error) {
+    console.error("Error al crear vehículo:", error)
+
+    // Manejar errores específicos de Sequelize
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const field = error.errors[0]?.path || "campo"
+      return res.status(400).json({
+        message: `Ya existe un registro con este ${field}`,
+        field: field,
+        error: "DUPLICATE_ENTRY",
+      })
+    }
+
+    if (error.name === "SequelizeValidationError") {
+      const validationErrors = error.errors.map((err) => ({
+        field: err.path,
+        message: err.message,
+      }))
+      return res.status(400).json({
+        message: "Errores de validación",
+        errors: validationErrors,
+      })
+    }
+
     res.status(500).json({ message: error.message })
   }
 }
@@ -91,6 +137,23 @@ exports.update = async (req, res) => {
       }
     }
 
+    // Verificar si el VIN ya existe en otro vehículo (si se está actualizando)
+    if (req.body.vin && req.body.vin !== vehiculo.vin) {
+      const vehiculoExistente = await Vehiculo.findOne({
+        where: {
+          vin: req.body.vin,
+          id: { [Op.ne]: req.params.id }, // Excluir el vehículo actual
+        },
+      })
+
+      if (vehiculoExistente) {
+        return res.status(400).json({
+          message: "Ya existe un vehículo con este número VIN",
+          field: "vin",
+        })
+      }
+    }
+
     await vehiculo.update({
       vin: req.body.vin || vehiculo.vin,
       color: req.body.color || vehiculo.color,
@@ -104,8 +167,42 @@ exports.update = async (req, res) => {
       modeloId: req.body.modeloId || vehiculo.modeloId,
     })
 
-    res.status(200).json(vehiculo)
+    // Obtener el vehículo actualizado con las relaciones
+    const vehiculoActualizado = await Vehiculo.findByPk(vehiculo.id, {
+      include: [
+        {
+          model: Modelo,
+          attributes: ["id", "nombre", "anio", "tipo"],
+          include: [{ model: Marca, attributes: ["id", "nombre"] }],
+        },
+      ],
+    })
+
+    res.status(200).json(vehiculoActualizado)
   } catch (error) {
+    console.error("Error al actualizar vehículo:", error)
+
+    // Manejar errores específicos de Sequelize
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const field = error.errors[0]?.path || "campo"
+      return res.status(400).json({
+        message: `Ya existe un registro con este ${field}`,
+        field: field,
+        error: "DUPLICATE_ENTRY",
+      })
+    }
+
+    if (error.name === "SequelizeValidationError") {
+      const validationErrors = error.errors.map((err) => ({
+        field: err.path,
+        message: err.message,
+      }))
+      return res.status(400).json({
+        message: "Errores de validación",
+        errors: validationErrors,
+      })
+    }
+
     res.status(500).json({ message: error.message })
   }
 }

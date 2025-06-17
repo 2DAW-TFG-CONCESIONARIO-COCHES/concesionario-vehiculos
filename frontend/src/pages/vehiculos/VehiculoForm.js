@@ -25,6 +25,7 @@ const VehiculoForm = () => {
   const [modelos, setModelos] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [imagePreviewUrls, setImagePreviewUrls] = useState([])
   const [dragActive, setDragActive] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
@@ -106,6 +107,14 @@ const VehiculoForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target
+
+    // Limpiar errores del campo cuando el usuario empiece a escribir
+    if (fieldErrors[name]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [name]: null,
+      })
+    }
 
     if (type === "number") {
       setFormData({
@@ -217,6 +226,7 @@ const VehiculoForm = () => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setFieldErrors({})
 
     const vehiculoData = {
       vin: formData.vin,
@@ -239,9 +249,33 @@ const VehiculoForm = () => {
       }
       navigate("/vehiculos")
     } catch (err) {
-      setError("Error al guardar el vehículo")
+      console.error("Error al guardar vehículo:", err)
+
+      if (err.response?.data) {
+        const errorData = err.response.data
+
+        // Manejar errores específicos
+        if (errorData.error === "DUPLICATE_ENTRY" || errorData.field) {
+          setFieldErrors({
+            [errorData.field]: errorData.message,
+          })
+          setError(`Error: ${errorData.message}`)
+        } else if (errorData.errors && Array.isArray(errorData.errors)) {
+          // Manejar múltiples errores de validación
+          const errors = {}
+          errorData.errors.forEach((err) => {
+            errors[err.field] = err.message
+          })
+          setFieldErrors(errors)
+          setError("Por favor, corrige los errores en el formulario")
+        } else {
+          setError(errorData.message || "Error al guardar el vehículo")
+        }
+      } else {
+        setError("Error de conexión. Por favor, inténtalo de nuevo.")
+      }
+
       setLoading(false)
-      console.error(err)
     }
   }
 
@@ -264,21 +298,15 @@ const VehiculoForm = () => {
         <div className="vehiculo-form-card">
           <div className="vehiculo-form-header">
             <div className="container">
-              <div className="row align-items-center">
-                <div className="col-md-8">
-                  <h1 className="vehiculo-form-title">{isEditing ? "Editar Vehículo" : "Nuevo Vehículo"}</h1>
-                  <p className="vehiculo-form-subtitle">
-                    {isEditing ? "Actualiza la información del vehículo" : "Añade un nuevo vehículo al inventario"}
-                  </p>
+              <h1 className="vehiculo-form-title">{isEditing ? "Editar Vehículo" : "Nuevo Vehículo"}</h1>
+              <p className="vehiculo-form-subtitle">
+                {isEditing ? "Actualiza la información del vehículo" : "Añade un nuevo vehículo al inventario"}
+              </p>
+              {isEditing && (
+                <div className={`vehiculo-form-badge ${getBadgeClass(formData.estado)}`}>
+                  {getEstadoLabel(formData.estado)}
                 </div>
-                {isEditing && (
-                  <div className="col-md-4 text-end">
-                    <div className={`vehiculo-form-badge ${getBadgeClass(formData.estado)}`}>
-                      {getEstadoLabel(formData.estado)}
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
 
@@ -330,12 +358,13 @@ const VehiculoForm = () => {
                       type="text"
                       id="vin"
                       name="vin"
-                      className="form-control"
+                      className={`form-control ${fieldErrors.vin ? "error" : ""}`}
                       value={formData.vin}
                       onChange={handleChange}
                       placeholder="Ej: 1HGBH41JXMN109186"
                       required
                     />
+                    {fieldErrors.vin && <span className="error-message">{fieldErrors.vin}</span>}
                   </div>
                   <div className="form-group-enhanced">
                     <label htmlFor="color">

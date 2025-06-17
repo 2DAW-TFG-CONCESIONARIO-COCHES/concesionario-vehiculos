@@ -1120,7 +1120,6 @@ code {
 }
 
 .vehiculo-form-header {
-  padding: 3rem 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   margin-bottom: 2rem;
@@ -2695,6 +2694,16 @@ code {
     flex-wrap: wrap;
     justify-content: center;
   }
+
+  .navbar-links a {
+    width: 100%;
+    margin: 0.25rem 0;
+  }
+
+  .user-greeting {
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
 }
 
 /* Animations */
@@ -3700,66 +3709,47 @@ code {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.badge-nuevo {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
-  color: white;
-}
-
-.badge-usado {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  color: white;
-}
-
-/* Mejoras para el contenedor del formulario */
-.vehiculo-form-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-bottom: 2rem;
+  margin-top: 1rem;
 }
 
 .vehiculo-form-body {
-  padding: 2rem;
+  padding: 2.5rem;
 }
 
 /* Responsive para el header */
 @media (max-width: 768px) {
   .vehiculo-form-header {
-    padding: 1.5rem 0;
-    text-align: center;
+    padding: 1.5rem 1rem;
   }
-  
+
   .vehiculo-form-title {
     font-size: 1.8rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .vehiculo-form-subtitle {
     font-size: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .vehiculo-form-badge {
     margin-top: 1rem;
   }
-  
-  .vehiculo-form-header .col-md-4 {
-    text-align: center !important;
+
+  .vehiculo-form-body {
+    padding: 2rem 1.5rem;
   }
 }
 
 @media (max-width: 576px) {
   .vehiculo-form-header {
-    padding: 1rem 0;
+    padding: 1rem;
   }
-  
+
   .vehiculo-form-title {
     font-size: 1.6rem;
   }
-  
+
   .vehiculo-form-body {
     padding: 1.5rem;
   }
@@ -3792,13 +3782,13 @@ code {
     gap: 1rem;
     padding: 1rem 0;
   }
-  
+
   .navbar-links {
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.75rem;
   }
-  
+
   .navbar-links a,
   .user-greeting,
   .btn-logout,
@@ -3806,7 +3796,7 @@ code {
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
   }
-  
+
   .navbar-logo {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
@@ -3819,12 +3809,12 @@ code {
     width: 100%;
     text-align: center;
   }
-  
+
   .navbar-links a {
     width: 100%;
     margin: 0.25rem 0;
   }
-  
+
   .user-greeting {
     order: -1;
     margin-bottom: 0.5rem;
@@ -3842,7 +3832,7 @@ code {
 .vehiculo-form-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #333;  
+  color: #333;
   margin-bottom: 0.5rem;
   -webkit-background-clip: text;
   background-clip: text;
@@ -3853,7 +3843,7 @@ code {
   .vehiculo-form-header {
     padding: 1.5rem 1rem;
   }
-  
+
   .vehiculo-form-title {
     font-size: 1.7rem;
   }
@@ -3895,7 +3885,8 @@ code {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
+    repeat;
   opacity: 0.3;
 }
 
@@ -4151,31 +4142,31 @@ code {
   .modelo-form {
     padding: 1rem 0;
   }
-  
+
   .modelo-form-container {
     padding: 0 0.5rem;
   }
-  
+
   .modelo-form-header {
     padding: 2rem 1.5rem;
   }
-  
+
   .modelo-form-title {
     font-size: 1.8rem;
   }
-  
+
   .modelo-form-body {
     padding: 2rem 1.5rem;
   }
-  
+
   .modelo-form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .modelo-form-actions {
     flex-direction: column;
   }
-  
+
   .modelo-btn {
     width: 100%;
   }
@@ -4185,15 +4176,15 @@ code {
   .modelo-form-header {
     padding: 1.5rem 1rem;
   }
-  
+
   .modelo-form-title {
     font-size: 1.6rem;
   }
-  
+
   .modelo-form-body {
     padding: 1.5rem 1rem;
   }
-  
+
   .modelo-form-icon {
     width: 60px;
     height: 60px;
